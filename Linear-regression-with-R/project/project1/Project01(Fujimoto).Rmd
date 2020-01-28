@@ -1,0 +1,255 @@
+---
+title: "Project 1 - Analysis of NYC Restaurant Prices"
+author: "Jumpei Fujimoto"
+output:
+  html_notebook:
+    theme: flatly
+---
+
+## Description of Project
+
+In this project, you will use ordinary least squares regression to model the price at a restaurant using one of four possible predictors. The data is stored in the filed `nyc.txt`. This tab-separated text file contains information for 168 Italian restaurants in New York City. The dataset contains six variables for each restaurant: 
+
+<center>
+Variable | Description
+-----|----------------------------------------------
+**`Price`** | The average price, in USD, for a meal at the restaurant (including one drink and a tip).
+**`Food`** | The average customer rating of the food, on a scale from 1 to 30. 
+**`Decor`** | The average customer rating of the decor, on a scale from 1 to 30. 
+**`Service`** | The average cusstomer rating of the service, on a scale from 1 to 30.  
+**`Wait`** | The average wait time, in minutes, on a Saturday evening. 
+**`East`** | A binary variable. Equals 1 if the restaurant is east of 5th Avenue, and 0 otherwise. 
+</center>
+
+We will not be using the `East` column in this project. 
+
+## **Part A: Loading and Exploring the Data**
+
+Use the `read.table()` function to read the data into a dataframe called `df`. Display a summary of this dataframe. 
+
+```{r}
+df <- read.table("nyc.txt", sep="\t", header = TRUE)
+summary(df)
+```
+
+
+
+## **Part B: Graphical Analysis**
+
+Use the `plot()` function to create a scatter plot of **price** against the **food rating**. Style the plot as follows: 
+
+* Set `pch` to 21, set `bg` to a color of your choice, and set `col` to `black`.
+* Label the `x` axis: "Customer Rating of Food"
+* Label the `y` axis: "Price in $"
+* Title the plot: "Relationship between Food Rating and Price"
+
+
+```{r}
+plot(df$Price ~ df$Service, pch=21, col="black", bg="salmon", ylab = "Price in $", xlab = "Customer Rating of Food", main = "Relationship between Food Rating and Price")
+```
+
+Create a scatter plot of **price** against the **decor rating**. Style the plot as describe previously, with the following modifications:
+
+* Label the `x` axis: "Customer Rating of Decor"
+* Title the plot: "Relationship between Decor Rating and Price"
+
+
+```{r}
+plot(df$Price ~ df$Decor, pch=21, col="black", bg="salmon", ylab = "Price in $", xlab = "Customer Rating of Decor", main = "Relationship between Decor Rating and Price")
+```
+
+
+Create a scatter plot of **price** against the **service rating**. Style the plot as described previously, with the following modifications:
+
+* Label the `x` axis: "Customer Rating of Service"
+* Title the plot: "Relationship between Service Rating and Price"
+
+
+
+```{r}
+plot(df$Price ~ df$Service, pch=21, col="black", bg="salmon", ylab = "Price in $", xlab = "Customer Rating of Service", main = "Relationship between Service Rating and Price")
+```
+
+Create a scatter plot of **price** against the **wait time**. Style the plot as described previously, with the following modifications:
+
+* Label the `x` axis: "Average Wait Time (in min)"
+* Title the plot: "Relationship between Wait Time and Price"
+
+
+
+```{r}
+plot(df$Price ~ df$Wait, pch=21, col="black", bg="salmon", ylab = "Price in $", xlab = "Average Wait Time(in min)", main = "Relationship between Wait Time and Price")
+```
+
+
+
+## **Part C: Create the Linear Models**
+
+We will now generate four regression models. Each model will have `Price` as the response variable, and one of the other variables as the predictor. 
+
+In the code chunk below, regress `Price` against `Food`, storing the resulting model in a variable called `mod1`. Display a summary of this model. 
+
+
+```{r}
+mod1 <- lm(df$Price ~ df$Food)
+summary(mod1)
+```
+
+In the code chunk below, regress `Price` against `Decor`, storing the resulting model in a variable called `mod2`. Display a summary of this model. 
+
+```{r}
+mod2 <- lm(df$Price ~ df$Decor)
+summary(mod2)
+```
+
+
+In the code chunk below, regress `Price` against `Service`, storing the resulting model in a variable called `mod3`. Display a summary of this model. 
+
+```{r}
+mod3 <- lm(df$Price ~ df$Service)
+summary(mod3)
+```
+
+In the code chunk below, regress `Price` against `Wait`, storing the resulting model in a variable called `mod4`. Display a summary of this model. 
+
+```{r}
+mod4 <- lm(df$Price ~ df$Wait)
+summary(mod4)
+```
+
+## **Part D: Summary of Models**
+
+In each of the equations below, replace the zeros with the appropriate parameter estimate. Round all parameter estimates to 4 significant digits. 
+
+$$\hat {Price} = -17.8321 + 2.9390 \cdot Food$$
+
+$$\hat {Price} = -1.362 + 2.490 \cdot Decor$$
+$$\hat {Price} = -11.9778 + 2.8184 \cdot Service$$
+$$\hat {Price} = 39.88559 + 0.12265 \cdot Wait$$
+
+
+## **Part E: Model Diagnostics**
+
+Create a vector named `r2_vector` that contains the $r^2$ value for each of the four models (in the order in which the models were created). Name the entries of this vector `mod1`, `mod2`, `mod3`, and `mod4`. Display the vector. 
+
+
+```{r}
+r2_vector <- c(.3932, .5247, .4111, .01228)
+names(r2_vector) <- c("mod1", "mod2", "mod3", "mod4")
+
+r2_vector
+
+```
+
+Create a vector named `t_vector` that contains the value of the test statistic, t, for the hypothesis test $H_0: \beta_1 = 0$ for each of the four models (in the order in which the models were created). Name the entries of this vector `mod1`, `mod2`, `mod3`, and `mod4`. Display the vector. 
+
+```{r}
+t_vector <- c(10.371, 13.537, 10.764, 1.437)
+names(t_vector) <- c("mod1", "mod2", "mod3", "mod4")
+
+t_vector
+```
+
+List the models in the order of their p-values for this particular hypothesis test, from lowest to highest. 
+1. Model 2
+2. Model 3
+3. Model 1
+4. Model 4
+
+**Replace this line with your answer.**
+
+
+Create a vector named `rse_vector` that contains the value of $s$ for each of the four models (in the order in which the models were created). Name the entries of this vector `mod1`, `mod2`, `mod3`, and `mod4`. Display the vector. 
+
+```{r}
+rse_vector <- c(7.261, 6.426, 7.153, 9.263)
+names(rse_vector) <- c('mod1', 'mod2', 'mod3', 'mod4') 
+
+rse_vector
+```
+
+Display the standard deviation of the response variable. 
+
+```{r}
+sd <- sd(df$Price)
+sd
+```
+
+
+## **Part F: Model Selection**
+
+Based on the model diagnostics above, use the list below to rank the models in order from best to worst. 
+
+1. Model 2
+2. Model 3
+3. Model 1
+4. Model 4
+
+Explain why you selected the model you did as the best model. Explain why you selected the model you did as the worst model. 
+
+r2_vector is the key how to analyze the model because r2_vector explains how much percentage covered the variance by the model. At the case in mod4, r2_vector is loweset in those four models. It means that mod4 does not fit the most. On the contrary, the r2_vector of mod2 is the highest. It means that mod2 fits the most to the actual value.
+
+**Replace this line with your answer.**
+
+## **Part G: Residual Analysis**
+
+We will now perform an analysis of the residuals in the model you identified as being the best model. In the code chunk below, create a vector `res` that stores the residuals for your selected model. Then create a residual plot for that model, with the following characteristics:
+
+* Set `pch` to 21, set `bg` to a color of your choice, and set `col` to `black`.
+* Select an appropriate label for the `x` axis.
+* Label the `y` axis: "Residual"
+* Title the plot: "Residual Plot"
+* Add a horizontal line to your plot at $y=0$. 
+* Color the line red, with `lwd` set to 2. 
+
+```{r}
+res <- mod2$residuals
+
+plot(res ~ df$Decor, pch = 21, bg = "salmon", col = "black", 
+     xlab = "Customer Rating of Decor", ylab = "Residual", 
+     main = "Residual Plot")
+abline(h = 0, col = "red", lwd = 2)
+```
+
+**Replace this line with your observations concerning the residual plot. Does it look good? Why or why not?**
+
+We will now attempt to assess the normality of the residuals. Create a histogram of the residuals in your selected model. Set the histogram to have 20 breaks. Set the `col` parameter to a color of your choice. 
+
+```{r}
+hist(res, breaks = 20, col = "blue", 
+     xlab = "Residuals", main = "Histogram of Residuals")
+```
+
+**Replace this line with your observations concerning the histogram. Does it look good? Why or why not?**
+
+Ceate a qqplot plot of the residuals. 
+
+```{r}
+qqnorm(mod2$residuals)
+qqline(mod2$residuals)
+```
+
+**Replace this line with your observations concerning the qqplot. Does it look good? Why or why not?**
+
+## **Part E: Predictions**
+
+
+Use your model to create predictions for the price at three restaurants with the following characteristics:
+
+Food | Decor | Service | Wait
+-----|-------|---------|-------
+  16 |  21   |   16    |  37
+  18 |   9   |   21    |  15
+  21 |  14   |   18    |  31
+
+With each prediction, provide a 90% prediction interval for the price. 
+
+**Generate all three predictions with only one call of the `predict()` function.**
+
+```{r}
+Decor <- data.frame(Decor = c(21, 9, 14))
+predict(lm(Price~Decor,df), Decor, interval = "predict", level = .90)
+```
+
+
+
