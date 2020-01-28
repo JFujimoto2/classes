@@ -1,0 +1,138 @@
+---
+title: "Project 4 - Analysis of Viral Infections"
+author: Jumpei Fujimoto. 
+output: 
+  html_notebook:
+    theme: flatly
+---
+
+## Description of Project
+
+The purpose of this project is to create a logistic regression model to estimate the probability that children in a specific city have been infected by a certain mosquito-borne virus. 
+
+A sample of 176 children from the city was collected. The following features are recorded for each of the children:
+
+<center>
+Variable | Description
+-----|----------------------------------------------
+**`Age`** | The age of the individual. 
+**`Class`** | A qualitative (factor) variable measuring the individual’s economic status. The levels are “Lower”, “Middle”, and “Upper”.
+**`District`** | A qualitative variable indicating which of two districts in the city the individual lives in. 
+**`Infected`** | A binomial variable indicating whether or not the individual has contracted the virus.
+</center>
+
+Our goal in this project will be to create a logistic regression model that attempts to predict the probability that a particular indivual has been infected by the virus given their age, class, and district. 
+
+## Part A: Loading and Prepare the Data
+
+Begin by loading the `ggplot2` package. 
+
+```{r, message=FALSE}
+require(ggplot2)
+
+```
+
+Load the data contained in the tab-separated text file "Virus.txt" into a data frame, and generate a summary of the data frame. 
+
+```{r}
+df <- read.table("Virus.txt", sep="\t", header=TRUE)
+summary(df)
+```
+
+If there are any qualitative variables that are being recorded with numerical codes, convert them into factors and create a new summary of the data frame. 
+
+```{r}
+df$Class <- factor(df$Class)
+df$District <- factor(df$District)
+df$Infected <- factor(df$Infected)
+```
+
+
+## Part B: Graphical Analysis
+
+The following code chunk will created a "stacked" bar chart that indicates the proporton of children of each that have become infected by the virus. Run this code as-is. 
+
+```{r}
+ggplot(df, aes(x=Age, fill=Infected)) + geom_bar(position="fill")
+```
+
+** As age is getting older, population of Infected people is geetting smaller.**
+
+Create a stacked bar plot that shows the proportion of children in each class that have become infected by the virus. 
+
+```{r}
+ggplot(df, aes(x=Class, fill=Infected)) + geom_bar(position="fill")
+```
+
+**We can say that the individual’s economic status relates infection rates. When people are “Lower” class, infection rate is high. Contracted with the "Lower" class, When people are “Upper” class, infection rate is low.**
+
+Use `ggplot` to create a bar plot that shows the proportion of children in each district that have become infected by the virus. 
+
+```{r}
+ggplot(df, aes(x=District, fill=Infected)) + geom_bar(position="fill")
+```
+
+**The data insists that District B has a higher rate of infection than District A. However, we cannot say that difference is significant because there are only 12.5 % differences and the number of observation is 175, not large.**
+
+## Part C: Compare Models
+
+Consider a few different logistic regression models using various combinations of the predictors Age, Class, and District. You don't need to consider interaction variables. Create a new code chunk for each model you consider. 
+
+Your goal is to find a model that uses all relevant predictors, but excludes any predictors that are not relevant. Use the 5% level of signifance for your t-tests. 
+
+Provide a brief assessment of each model that you consider. 
+
+```{r}
+m1 <- glm(Infected ~ Age, family = binomial(link = "logit"), data = df)
+summary(m1)
+```
+
+```{r}
+m2 <- glm(Infected ~ Age + Class, family = binomial(link = "logit"), data = df)
+summary(m2)
+```
+
+```{r}
+m3 <- glm(Infected ~ Age + Class + District, family = binomial(link = "logit"), data = df)
+summary(m3)
+```
+
+Brief summary:From m1, the variable "Age" is strongly relating with "Infected rates". From m2, the variable "Class" is also relating wiht the Infected rates. However, from m3, we can say that the variable "District" is not significant relationship with the Infected rates. So, we can pick the model "m2" up for the best model. 
+
+
+## Part D: Final Model
+
+Let $\hat\pi$ denote the estimated probability of infection for a particular child. Provide the formula for the model you have selected for $\hat\pi$ by editing the equation below. Remove any unnecessary variables and replace the zeros as appropriate.
+
+$ln \left(\frac{\hat\pi}{1 - \hat\pi}\right)  = 1.71580 - 0.13890  \cdot Age - 1.11622\cdot ClassMiddle - 1.77493\cdot ClassUpper 
+
+
+## Part E: Making Predictions
+
+Use your model and the predict function to estimate the probabilities that individuals with the following characteristics will have contracted the virus:
+
+* 5 year old, Lower Class, District A
+* 5 year old, Middle Class, District A
+* 5 year old, Upper Class, District A
+* 10 year old, Lower Class, District B
+* 10 year old, Middle Class, District B
+* 10 year old, Upper Class, District B
+
+
+```{r}
+nd <- data.frame(
+  Age = c(5, 5, 5, 10, 10, 10),
+  Class = c("Lower", "Middle", "Upper", "Lower", "Middle", "Upper"),
+  District = c("A", "A", "A", "B", "B", "B")
+)
+
+predict(m2, nd, type = "response")
+```
+
+
+
+
+
+
+
+
