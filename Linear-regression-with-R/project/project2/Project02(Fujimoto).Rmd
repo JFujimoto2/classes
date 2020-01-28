@@ -1,0 +1,152 @@
+---
+title: "Project 2 - Analysis of Sales Data"
+author: Jumpei Fujimoto
+output: 
+  html_notebook:
+    theme: flatly
+---
+
+## Description of Project
+
+Assume that a company called Global Markets Inc. operates 127 grocery stores across the country. They collect data relating to annual sales for each of their stores. The data is stored in the data file "global.txt". A description of the fields in this dataset is as follows: 
+
+
+<center>
+Variable | Description
+-----|----------------------------------------------
+**`Sales`** | Annual sales, in $1000's. 
+**`SqFt`** | Size of store, measured in 1000's of square feet.  
+**`Inv`** | Value of inventory, in $1000's. 
+**`Adv`** | Annual advertising budget, in $1000's. 
+**`Pop`** | Population served by store, in 1000's of people. 
+**`MedInc`** | Median income of population, in $1000's. 
+</center>
+
+Our goal in this project will be to create a multiple linear regression model that attempts to predict `Sales` as a function of some combination of the remaining five variables. 
+
+
+## Part A: Loading and Exploring the Data
+
+Load the data contained in the text file into a data frame.
+
+```{r}
+# Replace with R code
+df <- read.table("global.txt", sep="\t", header=TRUE)
+```
+
+Create a summary of the data frame. 
+
+```{r}
+# Replace with R code
+summary(df)
+```
+
+Use `pairs()` to create a pairs plot showing scatterplots of all pairs of variables in the data frame. 
+
+```{r}
+# Replace with R code
+pairs(df)
+```
+
+Use `cor()` to create a correlation matrix showing the correlations of all pairs of variables in the data frame. 
+
+```{r}
+# Replace with R code
+cor(df)
+```
+
+**'Pop' valuable is the strongest linear relationship with 'sales' valuable. 'MedInc' and 'Inv' valuable have a strong correlation.**
+
+## Part B: Consider the Full Model 
+
+Create a model by regressing `Sales` against all of the other five variables at once. Then display a summary of this model.
+
+```{r}
+# Replace with R code
+mod1 <- lm(Sales ~ SqFt + Inv + Adv + Pop + MedInc, df)
+summary(mod1)
+```
+
+**This model does not seem good because p- value of 'SqFt', 'Inv', and 'MedInc' valuables are too large.**
+
+
+## Part C: Model Selection
+
+Based on your analysis up to this point, select one of the five potential predictors and create a simple linear regression model using only this one predictor. Create a summary of the model. 
+
+```{r}
+# Replace with R code
+mod2 <- lm(Sales ~ Pop, df)
+summary(mod2)
+```
+
+
+**This model looks better than 'mod1' because p-value is really small. However, it still has a problem because multiple R-squared are small.**
+
+Now add variables into the model one at a time, creating a summary and providing an evaluation of the model at each step. If a variable that you have added fails to improve the model, then remove it and add another variable. Explain your decisions at each step. 
+
+Continue this process until you have a satisfactory model. All of the coefficients in your final model should pass their t-tests with at the 5% level of significance. Of the models satisfying this criteria, select the one with the highest adjusted r-squared value.
+
+```{r}
+mod3 <- lm(Sales ~ Pop + MedInc + Adv, df)
+summary(mod3)
+```
+
+## Part D: Final Model
+
+Provide the equation for your final model by editing the formula below. Remove any unnecessary variables and replace the zeros as appropriate. 
+
+$\hat {Sales} = 24.9344 + 5.4770 \cdot Pop + 1.8985 \cdot MedInc + 1.6733\cdot Adv$
+
+## Part E: Residual Analysis
+
+Create a residual plot for your final model. 
+
+```{r}
+# Replace with R code
+plot(mod3$residuals ~ mod3$fitted.values, pch=21, col="black", bg="salmon",
+     xlab="Fitted Value", ylab="Residuals", main="Residual Plot")
+```
+
+**Replace this line with comments concerning your residual plot. Does it look good? Why or why not?**
+** I do not think that this variance of residuals is good because there are few points more that above the line y=0.
+
+Create a histogram of the residuals in your final model, using 20 breaks.
+
+```{r}
+# Replace with R code
+res <- mod3$residuals
+hist(res, col='orchid', breaks=20)
+```
+
+**It is a little bit left skewed distribution, however we could say that this is normal distribution.**
+
+Create a qq-plot of the residuals in your final model. 
+
+```{r}
+# Replace with R code
+qqnorm(res)
+qqline(res)
+```
+
+**It is a normal distribution because the  many plots are on the line but few plots are less than -1 and greater than loughly 1.5, are not on the line. For my assumption, it could fix if a sample size is larger.**
+
+
+## Part F: Predictions
+
+Generate 95% prediction intervals for annual sales of stores satisfying the following criteria:
+
+Store | SqFt | Inv | Adv | Pop | MedInc
+------|------|-----|-----|-----|---------
+Store 1 | 2.3 | 215 | 8.4 | 14.3 | 42.6
+Store 2 | 4.7 | 285 | 6.8 | 15.2 | 51.8
+Store 3 | 3.4 | 321 | 12.7 | 22.6 | 37.9
+
+
+
+```{r}
+# Replace with R code
+nd<- data.frame(Pop = c(14.3, 15.2, 22.6), MedInc = c(42.6, 51.8, 37.9), Adv = c(8.4, 6.8, 12.7))
+predict(mod3, newdata=nd, interval = "prediction", level = 0.95)
+```
+
