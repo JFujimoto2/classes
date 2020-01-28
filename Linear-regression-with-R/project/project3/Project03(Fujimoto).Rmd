@@ -1,0 +1,209 @@
+---
+title: "Project 3 - Diamonds Dataset"
+author: Jumpei Fujimoto
+output: 
+    html_notebook:
+        theme: flatly
+        toc: yes
+        toc_depth: 2
+---
+
+# Description of Project
+
+In this project, you will be working with the `diamonds` dataset. This dataset contains information for 53,940 diamonds sold in the US. Each diamond has ten features, but we will only be interested in the following five:
+
+<center>
+Variable | Description
+-----|----------------------------------------------
+`price` | The sales price of the diamond, in USD.
+`carat` | The weight of the diamond, measured in carats. One carat is 200 mg. 
+`cut` | Quality of the cut of the diamond. The levels (from worst to best) are `Fair, Good, Very Good, Premium, Ideal`. 
+`color` | Level of the tint in the diamond. Colorless diamonds are generally preferred. The levels of this variable (from worst to best) are: `J, I, H, G, D, E, D`. 
+`clarity` | Indicates the level of internal defects in the diamond. The levels (from worst to best) are: `I1, SI2, SI1, VS2, VS1, VVS2, VVS1, IF`.
+</center>
+
+Our goal will be to create a model for `price` using the remaining four variables listed as predictors. 
+
+# Part A: Load and Prepare the Data
+
+You will need the `ggplot2` package for this project. Load it now.  
+
+```{r}
+require(ggplot2)
+```
+
+
+The diamonds dataset is contained in the tab-separated file "diamonds.txt". Read the dataset into a dataframe called `df`, and then print a summary of this dataframe. 
+
+```{r}
+df <- read.table("diamonds.txt", sep="\t", header=TRUE)
+summary(df)
+```
+
+The variables `cut`, `color`, and `clarity` are factor (categorical/qualitative) variables. By default, R sets the levels for such variables to be alphabetical. However, the levels for each of these variables have an inherent ranking that is not consistent with an alphabetical ordering. To illustrate this point, run the following code chunk to see the current ordering for the levels of each of these variables, and compare these orders to the ones provided at the beginning of this document. 
+
+```{r}
+list(
+  cut_levels = levels(df$cut),
+  color_levels = levels(df$color),
+  clarity_level = levels(df$clarity)
+)
+```
+
+To avoid any potential confusion, we will explicitly set the levels for each of these variables to be in increasing order of quality. Replace the blank lines in the code chunk below with a list of levels for each variable, from worst to best. You will need to surround each level name with quotation marks. Separate the levels by commas. 
+
+
+```{r}
+df$cut <- factor(df$cut, levels=c("Fair", "Good", "Very Good", "Premium", "Ideal"))
+df$color <- factor(df$color, levels = c("J", "I", "H", "G", "E", "D"))
+df$clarity <- factor(df$clarity, levels=c("I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF"))
+```
+
+Run the cell below to confirm that the levels for the factor variables are now in the correct order. 
+
+```{r}
+list(
+  cut_levels = levels(df$cut),
+  color_levels = levels(df$color),
+  clarity_level = levels(df$clarity)
+)
+```
+
+# Part B: Exploratory Plots
+
+Use `ggplot()` to create a scatter plot plotting `price` against `carat`. Color the points by `clarity` and set an alpha level of 0.6. 
+
+```{r}
+ggplot(df, aes(y = price, x = carat, col = clarity)) + 
+  geom_point(alpha = 0.6, size = 2)
+```
+
+We saw in class that the relationship between `price` and `carat` turned out to be approximately linear after a log-log transformation. Recreate the plot from above, replacing these two variables with their natural logarithms. 
+
+```{r}
+ggplot(df, aes(y = log(price), x = log(carat), col = clarity)) + 
+  geom_point(alpha = 0.6, size = 2)
+```
+
+
+Recreate the previous plot, but add a facet grid by appending the following code to the end of your ggplot command: `+ facet_grid(color~cut)`.
+
+```{r}
+ggplot(df, aes(y = log(price), x = log(carat), col = clarity)) + 
+  geom_point(alpha = 0.6, size = 2) + facet_grid(color~cut)
+```
+
+# Part C: Create the Model
+
+Create a regression model using the logarithm of `price` as the response. The predictors should be `cut`, `color`, `clarity`, and the logarithm of `carat`. Display a summary of your model. 
+
+```{r}
+s1 <-lm(log(price) ~ cut + color + clarity + log(carat), data =df)
+summary(s1)
+```
+
+**Based solely on the summary output above, does this model look good? Why or why not? Do you have any concerns about the model?**
+
+It looks good because low p- value, good R-squared value and t- value is large enough.
+
+
+# Part D: Interpreting Model Coefiecients
+
+Use the summary of your model to answer each of the the questions below. 
+
+**Question 1. Explain the meaning of the parameter estimate for `log(carat)`. In particular, what does the value of this parameter estimate tell you about how changes in carat size affect changes in price? Be specific. **
+
+log(carat) relates the percentage of price. If the size of log(carat) increases 1, the price increases 1.876446%.
+
+<br>
+**Question 2. What are the base levels for the factor variables `cut`, `color`, and `clarity`?**
+
+The base level of cut is "Fair" and for color is "J" and for clarity is "I1".
+
+<br>
+**Question 3. Consider two diamonds: Diamond A and Diamond B. Assume that Diamond A has a "Fair" quality cut, while Diamond B has a "Very Good" quality cut. The diamonds are otherwise identical. Let `PredA` and `PredB` be the predicted prices of these two diamonds according to your model. Find `PredB / PredA`. Round your answer to four decimal places.** 
+
+1.1244
+
+<br>
+**Question 4. Consider two diamonds: Diamond A and Diamond B. Assume that Diamond A has a "Fair" quality cut, while Diamond B has an "Ideal" quality cut. The diamonds are otherwise identical. Let `PredA` and `PredB` be the predicted prices of these two diamonds according to your model. Find `PredB / PredA`. Round your answer to four decimal places.**  
+
+1.1750
+
+<br>
+**Question 5. Consider two diamonds: Diamond A and Diamond B. Assume that Diamond A has a color rating of "J", while Diamond B has a color rating of "H". The diamonds are otherwise identical. Let `PredA` and `PredB` be the predicted prices of these two diamonds according to your model. Find `PredB / PredA`. Round your answer to four decimal places.** 
+
+1.12968
+
+<br>
+**Question 6. Consider two diamonds: Diamond A and Diamond B. Assume that Diamond A has a color rating of "H", while Diamond B has a color rating of "E". The diamonds are otherwise identical. Let `PredA` and `PredB` be the predicted prices of these two diamonds according to your model. Find `PredB / PredA`. Round your answer to four decimal places.** 
+
+1.2968
+
+
+# Part E: Residual Analysis
+
+Create a residual plot for your model. 
+```{r}
+res <- s1$residuals
+fit <- s1$fitted.values
+
+plot(res ~ fit)
+abline(h = 0, col = "dodgerblue1", lwd =2)
+```
+
+
+**What are your impressions of this residual plot?**
+
+This is good residual plot. Even thogh there are some outliers and li, most of them are almost equal variability based on residual = 0.
+
+<br>
+In the cell below, add code between the two `par()` functions to display a histogram and a qqplot of the residuals. 
+
+```{r}
+par(mfrow=c(1,2))
+hist(res)
+qqnorm(res)
+qqline(res)
+```
+
+**What are your impressions of these two plots?**
+
+The histogram of residual is really good normal distribution. Normal QQ plot is little bit heavy tail distribution. Overall, I could say those models are good results.
+
+# Part F: Generate Predictions
+
+Generate predictions for five diamonds with the following characteristics:
+
+<center>
+Diamond | Carat | Cut          | Color | Clarity
+--------|-------|--------------|-------|------------
+  1     |  0.5  | Good         | I     | SI2 
+  2     |  0.5  | Ideal        | I     | SI2 
+  3     |  0.5  | Good         | E     | VVS1
+  4     |  1.0  | Fair         | J     | I1
+  5     |  1.0  | Very Good    | G     | VS2
+</center>
+
+Display the predicted price for each diamond, along with the 90% prediction interval for each such price. Generate all five predictions with a single call to the `predict()` function. Part of the code has been provided for you. 
+
+```{r}
+nd <- data.frame(
+  carat = c(0.5, 0.5, 0.5, 1.0, 1.0), 
+  cut = c("Good", "Ideal", "Good", "Fair", "Very Good"), 
+  color = c("I", "I", "E", "J", "G"),
+  clarity = c("SI2", "SI2", "VVS2", "I1", "VS2")
+)
+
+pred <- predict(s1, nd, interval = "prediction", level=0.90)
+
+exp(pred)
+```
+
+
+
+
+
+
+
+
