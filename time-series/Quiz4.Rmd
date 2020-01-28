@@ -1,0 +1,35 @@
+---
+title: "Quiz 4"
+output: html_notebook
+---
+
+a.
+```{r}
+ACF = ARMAacf(ar=0, ma=c(-0.55,-1, -0.3), 15)[-1] #ACF with coefficients of the model
+PACF = ARMAacf(ar=0, ma=c(-0.55,-1, -0.3), 15, pacf=TRUE) #PACF with coefficients of the model
+par(mfrow=c(1,2))
+plot(ACF, type="h", xlab="lag", ylim=c(-.8,1)); abline(h=0)
+plot(PACF, type="h", xlab="lag", ylim=c(-.8,1)); abline(h=0)
+```
+
+b.
+```{r}
+ACF = ARMAacf(ar=c(1.5,-0.56), ma=0, 24)[-1] #ACF with coefficients of the model
+PACF = ARMAacf(ar=c(1.5,-0.56), ma=0, 24, pacf=TRUE) #PACF with coefficients of the model
+par(mfrow=c(1,2))
+plot(ACF, type="h", xlab="lag", ylim=c(-.8,1)); abline(h=0)
+plot(PACF, type="h", xlab="lag", ylim=c(-.8,1)); abline(h=0)
+```
+
+
+
+c.
+```{r}
+ACF = ARMAacf(ar=c(0.6), ma =c(0, -0.9), 15)[-1] #ACF with coefficients of the model
+PACF = ARMAacf(ar=c(0.6), ma=c(0,-0.9), 15, pacf=TRUE) #PACF with coefficients of the model
+par(mfrow=c(1,2))
+plot(ACF, type="h", xlab="lag", ylim=c(-.8,1)); abline(h=0)
+plot(PACF, type="h", xlab="lag", ylim=c(-.8,1)); abline(h=0)
+```
+
+

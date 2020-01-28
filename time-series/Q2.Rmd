@@ -1,0 +1,47 @@
+---
+title: "Q2"
+output: html_notebook
+---
+## 1 ##
+```{r}
+df <- read.table("/Users/fujimoto/Desktop/Desktop - JP's MacBook Air/Time Series/CPIGrowth.txt", header=TRUE)
+plot(df$Date, df$CPIGrowth,ylab="Growth Rates Same Period Previous Year", xlab="Year", main="CPI: Total All Items for the U.S., 2000-2018")
+lines(df$Date, df$CPIGrowth,col="red")
+
+acf(df$CPIGrowth,40, main="") #This plots the ACF. main="" turns the title off
+acf(df$CPIGrowth,lag.max = 12, plot=FALSE)
+```
+## 2 ##
+```{r}
+df <- read.table("/Users/fujimoto/Desktop/Desktop - JP's MacBook Air/Time Series/Earthquakes.txt", header=TRUE)
+plot(df$Year, df$Total,ylab="Total", xlab="Year", main="Number of earthquakes per year magnitude 7.0 or greater, 1900-1998")
+lines(df$Year, df$Total,col="red")
+
+acf(df$Total,40, main="") #This plots the ACF. main="" turns the title off
+acf(df$Total,lag.max = 12,plot=FALSE)
+```
+
+
+## 3 ##
+```{r, fig.height = 10, fig.width = 9}
+set.seed(1001)
+z = 2*rbinom(201, 1, .5) - 1 # simulated sequence of coin tosses
+# 2t how can I use in x
+t  = seq(1, 200, 1)
+x = 2*t + filter(z, sides=1, filter=c(1,+.4))[-1] #Simulated MA(1) process where we delete the first iteration
+plot.ts(x ,col="blue",ylab=expression(X[t]),xlab="Time"); 
+acf(x, main="")
+acf(x,lag.max=12, plot=FALSE)
+```
+## 5 ##
+```{r}
+library(TSA)
+```
+
+```{r}
+data("color")
+plot(color, ylab='Color Property', xlab='Batch', type='o', col="red", main="First Difference in Color Property")
+## acf function with "diff(color)."
+acf(x, main="")
+acf(x,lag.max=12, plot=FALSE)
+```

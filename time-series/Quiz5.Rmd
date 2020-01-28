@@ -1,0 +1,55 @@
+---
+title: "Quiz 5"
+output: 
+  html_notebook:
+    theme: flatly
+    toc: yes
+    toc_depth: 2
+---
+
+## 1.a
+```{r}
+update.packages('forecast') #updating package
+library(forecast)
+```
+```{r}
+set.seed(470)
+require(astsa)
+require(forecast)
+```
+```{r}
+ar2 = arima.sim(list(order=c(2,0,0), ar=c(0.75,-.125)), n = 140) #This simulates an AR(2) model with our chosen coefficients for 140 iterations.
+plot(ar2, axes=FALSE, xlab="Time", ylab=expression(X[t]), main="AR(2) Model") #This plots the AR(2) model.
+axis(2); axis(1, at=seq(0,140,by=10)); box() #This spaces our x-axis by 10 units.
+
+```
+
+##1.b
+```{r}
+MA2 = arima.sim(list(order=c(0,0,2), ma=c(-0.55,-.3)), n = 140) #This simulates an MA(2) model with our chosen coefficients for 140 iterations.
+plot(ar2, axes=FALSE, xlab="Time", ylab=expression(X[t]), main="MA(2) Model") #This plots the MA(2) model.
+axis(2); axis(1, at=seq(0,140,by=10)); box() #This spaces our x-axis by 10 units.
+```
+
+##1.c
+```{r}
+arma = arima.sim(list(order=c(2,0,1), ar=c(0.6,-.2), ma=c(-.9)), n = 140) #This simulates an ARMA model with our chosen coefficients for 140 iterations.
+plot(arma, axes=FALSE, xlab="Time", ylab=expression(X[t]), main="ARMA(2,1) Model") #This plots the ARMA model.
+axis(2); axis(1, at=seq(0,140,by=10)); box() #This spaces our x-axis by 10 units.
+```
+##2
+```{r}
+library(TSA)
+data("color")
+```
+```{r}
+mod=auto.arima(color)
+fc=forecast(mod,h=5)
+
+plot(color, ylab='Color Property', xlab='Batch')
+plot(fc, ylab='Color Property', xlab='Batch')
+```
+
+
+
+

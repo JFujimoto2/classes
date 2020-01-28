@@ -1,0 +1,104 @@
+---
+title: "1.4 Stationary Time Series"
+author: "Nick Wintz"
+output: 
+  html_notebook:
+    theme: flatly
+    toc: yes
+    toc_depth: 2
+---
+
+#Stationary Time Series
+##White Noise
+
+>**Example (White Noise):** Let $W_t\sim WN(0,1)$. Here, consider 100 iterations.
+
+
+```{r, fig.height = 10, fig.width = 9}
+set.seed(100); # This allows us to reproduce our results
+
+par(mfrow=c(2,1)) #This gives us our graphs in 2 rows, 1 column
+
+n=seq(1,100,1) #This gives our iterations starting from n=1 to n=100, with a step size of 1
+WN=rnorm(100,0,1); #Here is the White Noise. rnorm(n,mean,std dev)
+plot(n,WN,type="o",col="blue",main="White Noise",ylab=expression(W[t]),xlab="Time") #This plots the white noise
+
+acf(WN, main="") #This plots the ACF. main="" turns the title off
+```
+
+##MA(1) Models
+>**Example (MA(1) Models):** Let $X_t=W_t+0.6W_{t-1}$, where $W_t\sim WN(0,1)$. Here, we consider 320 iterations. To avoid any startup issues, we delete the first 20 iterations.
+
+```{r, fig.height = 10, fig.width = 9}
+set.seed(100) ;# This allows us to reproduce our results
+par(mfrow=c(2,1)) #This gives us our graphs in 2 rows, 1 column
+
+w<-rnorm(320,0,1) #noise with 20 extra iterations to avoid startup issues  
+v<-filter(w, sides=1, c(1,.6))[-(1:20)] #MA(1). The c term represents the coefficients and the last term removes the first 20 iterations
+plot.ts(v, main="MA(1)",col="blue",ylab=expression(X[t]),xlab="Time") #This plot the MA(1) model
+
+acf(v, main="") #This plots the ACF.
+```
+
+##AR(1) Models
+>**Example (AR(1) Models):** Let $X_t=0.6X_{t-1}+W_{t}$, where $W_t\sim WN(0,1)$. Here, we consider 320 iterations. To avoid any startup issues, we delete the first 20 iterations.
+
+```{r, fig.height = 10, fig.width = 9}
+set.seed(100); # This allows us to reproduce our results
+par(mfrow=c(2,1)) #This gives us our graphs in 2 rows, 1 column
+
+w<-rnorm(320,0,1) #noise with 20 extra iterations to avoid startup issues 
+y<-filter(w, filter=c(.6), method="recursive")[-(1:20)] #AR(1). The c term represents the coefficients and the last term removes the first 20 iterations
+plot.ts(y, main="AR(1)",col="blue",ylab=expression(X[t]),xlab="Time") #This plot the MA(1) model
+acf(y,main="") #This plots the ACF.
+
+```
+
+#Nonstationary Time Series
+##Nonconstant Trend
+>**Example (Nonconstant Trend):** Let $X_t=1+0.1t+Y_{t}$, where $Y_t\sim WN(0,4)$. Let's use 100 iterations.
+
+```{r, fig.height = 10, fig.width = 9}
+set.seed(100); # This allows us to reproduce our results
+
+par(mfrow=c(2,1)) #This gives us our graphs in 2 rows, 1 column
+t=seq(1,100,1); #This gives our iterations starting from t=1 to t=100, with a step size of 1
+Mt<-1+.1*t; #Linear Trend
+Yt<-rnorm(length(t),0,2) #Y_t\sim WN(0,4)
+Xt<-Mt+Yt #Time series with linear trend
+plot.ts(Xt,type="o",xlab="Time",ylab=expression(X[t]),main="Nonconstant Trend") #This plots the time series with a nonconstant trend
+lines(t,Mt,col="red") #This is the graph of linear trend itself
+acf(Xt, main="") #This plots the ACF
+
+```
+
+
+##Seasonal Trend 
+>**Example (Seasonal Trend):** Let $X_t=-2\cos(\pi t/5)+3\sin(\pi t/3)+W_{t}$, where $W_t\sim WN(0,4)$. Let's use 100 iterations.
+
+```{r, fig.height = 10, fig.width = 9}
+set.seed(100);  # This allows us to reproduce our results
+par(mfrow=c(2,1)) #This gives us our graphs in 2 rows, 1 column
+
+
+t=seq(1,100,1) #This gives our iterations starting from t=1 to t=100, with a step size of 1
+St<-2*cos(pi*t/5)+3*sin(pi*t/3) #Periodic Trend
+Wt<-rnorm(length(t),0,2) #White Noise
+Zt<-St+Wt #Time series with seasonal component
+plot(t,Zt,xlab="Time",ylab=expression(X[t]), main="Seasonal Trend") #This plots our data points
+lines(t,St,col="red") #This draws the curve fit
+acf(Zt, main="") #This plots the ACF
+```
+
+##Nonconstant Variance
+>**Example (Random Walk):** Let $\displaystyle S_{t}=\sum_{j=1}^{t}X_{j}$, where $X_{t}\sim WN(0,1)$. Let's use 200 iterations.
+
+```{r, fig.height = 10, fig.width = 9}
+set.seed(100); # This allows us to reproduce our results
+par(mfrow=c(2,1)) #This gives us our graphs in 2 rows, 1 column
+t=seq(1,200,1) #This gives our iterations starting from t=1 to t=200, with a step size of 1
+Xt1<-rnorm(length(t),0,1) #X_{t}\sim WN(0,1)
+St1<-cumsum(Xt1) #Here is the random walk
+plot.ts(St1,type="o",col="blue", xlab="Time",ylab=expression(S[t]), main="Random Walk") #This plots the random walk
+acf(St1, main="") #This plots the ACF
+```
